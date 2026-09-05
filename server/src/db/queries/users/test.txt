@@ -1,0 +1,44 @@
+
+--SELECT--
+//USERS table
+
+//QUERY 1: Select all the data in users table
+
+SELECT userID, userName, isVerifiedStudent, password, studentNumber, isActive, joinedAt, isAdmin, createdAt FROM Users;
+SELECT * FROM users;
+
+//QUERY 2: Select all the data in users table with specific ID
+
+SELECT userID, userName, isVerifiedStudent, password, studentNumber, isActive, joinedAt, isAdmin, createdAt FROM Users WHERE userID = 5;
+SELECT * FROM users WHERE userID = 5;
+
+//QUERY 3: Select all the data in users table where active is true
+SELECT * FROM Users WHERE isActive = TRUE;
+
+//QUERY 4: Select all the data in users table where the users is verified
+SELECT * FROM Users WHERE isVerifiedStudent = TRUE
+
+//QUERY 5: Select all the data in users table where active is true and veried is true
+SELECT * FROM Users WHERE isActive = TRUE AND isVerifiedStudent = TRUE;
+
+
+//sysAdmin table
+
+//QUERY 1: Select the admin information 
+SELECT 
+    SysAdmin.sysAdminID,
+    Users.userID,
+    Users.userName,
+    Users.isVerifiedStudent,
+    Users.password,
+    Users.studentNumber,
+    Users.isActive,
+    Users.joinedAt,
+    Users.isAdmin,
+    Users.createdAt
+FROM SysAdmin
+INNER JOIN Users
+    ON SysAdmin.userID = Users.userID
+WHERE Users.isAdmin = TRUE;
+
+
