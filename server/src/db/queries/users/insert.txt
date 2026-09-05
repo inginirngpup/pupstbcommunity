@@ -42,3 +42,4 @@ VALUES (1, 1, 'Emerging Technology', 'lorem ipsum dolor sit amet');
 
 INSERT INTO Groups (userID, groupName, description) 
 VALUES (1, 'Comsoc Society', 'Software Engineer Community');
+--INSERT--

@@ -174,33 +174,40 @@ ORDER BY e."createdAt" DESC;
 
 //QUERY 11: Group owner changes the group name
 
+BEGIN;
 EXPLAIN ANALYZE
 UPDATE "Groups"
 SET "groupName" = 'Computer Science Students'
 WHERE "groupID" = 42
   AND "userID" = 7;
+ROLLBACK;
 
 
 //QUERY 12: Group owner changes the group description
 
+BEGIN;
 EXPLAIN ANALYZE
 UPDATE "Groups"
 SET "description" = 'A group for students to discuss computer science, projects, and events.'
 WHERE "groupID" = 42
   AND "userID" = 7;
+ROLLBACK;
 
 
 //QUERY 13: Group owner transfers ownership to another user
 
+BEGIN;
 EXPLAIN ANALYZE
 UPDATE "Groups"
 SET "userID" = 15
 WHERE "groupID" = 42
   AND "userID" = 7;
+ROLLBACK;
 
 
 //QUERY 14: Admin edits a group announcement
 
+BEGIN;
 EXPLAIN ANALYZE
 UPDATE "Announcements"
 SET
@@ -208,10 +215,12 @@ SET
     "content" = 'The group meeting has been moved to Friday at 3 PM.'
 WHERE "announcementID" = 101
   AND "groupID" = 42;
+ROLLBACK;
 
 
 //QUERY 15: Admin edits a group event
 
+BEGIN;
 EXPLAIN ANALYZE
 UPDATE "Events"
 SET
@@ -219,10 +228,12 @@ SET
     "content" = 'The study session will now be held in Room 204.'
 WHERE "eventID" = 25
   AND "groupID" = 42;
+ROLLBACK;
 
 
 //QUERY 16: Approve a membership request
 
+BEGIN;
 EXPLAIN ANALYZE
 UPDATE "PermissionRequest"
 SET
@@ -231,10 +242,12 @@ SET
 WHERE "requestID" = 315
   AND "groupID" = 42
   AND "status" = 'PENDING';
+ROLLBACK;
 
 
 //QUERY 17: Reject a membership request
 
+BEGIN;
 EXPLAIN ANALYZE
 UPDATE "PermissionRequest"
 SET
@@ -243,10 +256,143 @@ SET
 WHERE "requestID" = 315
   AND "groupID" = 42
   AND "status" = 'PENDING';
+ROLLBACK;
 
 
 //QUERY 18: Delete a group and confirm cascade to children
 
+BEGIN;
 EXPLAIN ANALYZE
 DELETE FROM "Groups"
 WHERE "groupID" = 200;
+ROLLBACK;
+
+
+--UPDATE------------------------------------
+
+
+//QUERY 1: Group owner changes the group name
+
+BEGIN;
+
+EXPLAIN ANALYZE
+UPDATE "Groups"
+SET "groupName" = 'Computer Science Students'
+WHERE "groupID" = 42
+  AND "userID" = 7;
+
+ROLLBACK;
+
+
+//QUERY 2: Group owner changes the group description
+
+BEGIN;
+
+EXPLAIN ANALYZE
+UPDATE "Groups"
+SET "description" = 'A group for students to discuss computer science, projects, and events.'
+WHERE "groupID" = 42
+  AND "userID" = 7;
+
+ROLLBACK;
+
+
+//QUERY 3: Group owner transfers ownership to another user
+
+BEGIN;
+
+EXPLAIN ANALYZE
+UPDATE "Groups"
+SET "userID" = 15
+WHERE "groupID" = 42
+  AND "userID" = 7;
+
+ROLLBACK;
+
+
+//QUERY 4: Admin edits a group announcement
+
+BEGIN;
+
+EXPLAIN ANALYZE
+UPDATE "Announcements"
+SET "announcementTitle" = 'Updated Meeting Announcement',
+    "content" = 'The group meeting has been moved to Friday at 3 PM.'
+WHERE "announcementID" = 101
+  AND "groupID" = 42;
+
+ROLLBACK;
+
+
+//QUERY 5: Admin edits a group event
+
+BEGIN;
+
+EXPLAIN ANALYZE
+UPDATE "Events"
+SET "eventTitle" = 'Computer Science Study Session',
+    "content" = 'The study session will now be held in Room 204.'
+WHERE "eventID" = 25
+  AND "groupID" = 42;
+
+ROLLBACK;
+
+
+//QUERY 6: Member edits their comment in the group
+
+BEGIN;
+
+EXPLAIN ANALYZE
+UPDATE "Comments"
+SET "commentContent" = 'Updated comment about the group discussion.'
+WHERE "commentID" = 125
+  AND "userID" = 15
+  AND "isDeleted" = FALSE;
+
+ROLLBACK;
+
+
+//QUERY 7: Member deletes their comment using soft deletion
+
+BEGIN;
+
+EXPLAIN ANALYZE
+UPDATE "Comments"
+SET "isDeleted" = TRUE,
+    "timeDeleted" = NOW()
+WHERE "commentID" = 125
+  AND "userID" = 15
+  AND "isDeleted" = FALSE;
+
+ROLLBACK;
+
+
+//QUERY 8: Admin approves a request to join the group
+
+BEGIN;
+
+EXPLAIN ANALYZE
+UPDATE "PermissionRequest"
+SET "status" = 'APPROVED',
+    "reviewedAt" = NOW()
+WHERE "requestID" = 315
+  AND "groupID" = 42
+  AND "status" = 'PENDING';
+
+ROLLBACK;
+
+
+//QUERY 9: Admin rejects a request to join the group
+
+BEGIN;
+
+EXPLAIN ANALYZE
+UPDATE "PermissionRequest"
+SET "status" = 'REJECTED',
+    "reviewedAt" = NOW()
+WHERE "requestID" = 315
+  AND "groupID" = 42
+  AND "status" = 'PENDING';
+
+ROLLBACK;
+
