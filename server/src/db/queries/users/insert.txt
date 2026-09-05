@@ -1,0 +1,44 @@
+--INSERT QUERIES--
+
+INSERT INTO Users (userName, password, studentNumber)
+VALUES ("jDoe", "test123", "1990-00001-ST-1");
+
+
+INSERT INTO Threads (userID, content) 
+VALUES (1, 'lorem ipsum dolor sit amet'); 
+
+
+INSERT INTO Likes (threadID, userID, commentID) 
+VALUES (1, 1, NULL); 
+
+
+INSERT INTO Likes (threadID, userID, commentID) 
+VALUES (NULL, 1, 1); 
+
+
+INSERT INTO Comments (threadID, userID, commentContent) 
+VALUES (1, 1, 'wow'); 
+
+
+INSERT INTO Replies (commentID, userID, replyContent) 
+VALUES (1, 1, 'ang galing'); 
+
+
+INSERT INTO SysAdmin (userID) 
+VALUES (1); 
+
+
+INSERT INTO PermissionRequest (groupID, userID) 
+VALUES (1, 1); 
+
+
+INSERT INTO Announcements (groupID, userID, announcementTitle, content) 
+VALUES (1, 1, 'Lorem Ipsum', 'Lorem Ipsum dolor sit amet'); 
+
+
+INSERT INTO Events (groupID, userID, eventTitle, content) 
+VALUES (1, 1, 'Emerging Technology', 'lorem ipsum dolor sit amet'); 
+
+
+INSERT INTO Groups (userID, groupName, description) 
+VALUES (1, 'Comsoc Society', 'Software Engineer Community');

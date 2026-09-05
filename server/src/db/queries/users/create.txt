@@ -1,0 +1,163 @@
+--CREATE QUERIES--
+
+CREATE TABLE Users (
+    userID SERIAL PRIMARY KEY,
+    userName VARCHAR(100) NOT NULL UNIQUE,
+    isVerifiedStudent BOOLEAN NOT NULL DEFAULT FALSE,
+    password VARCHAR(100) NOT NULL,
+    studentNumber VARCHAR(50) UNIQUE,
+    isActive BOOLEAN NOT NULL DEFAULT FALSE,
+    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE Groups (
+    groupID SERIAL PRIMARY KEY,
+    groupName VARCHAR(50) NOT NULL UNIQUE,
+    description VARCHAR(255),
+    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    userID INT NOT NULL,
+
+    FOREIGN KEY (userID)
+        REFERENCES Users(userID)
+);
+
+
+CREATE TABLE Threads (
+    threadID SERIAL PRIMARY KEY,
+    userID INT NOT NULL,
+    content VARCHAR(255) NOT NULL,
+
+    FOREIGN KEY (userID)
+        REFERENCES Users(userID)
+);
+
+
+CREATE TABLE Comments (
+    commentID SERIAL PRIMARY KEY,
+    threadID INT NOT NULL,
+    userID INT NOT NULL,
+    commentContent VARCHAR(255) NOT NULL,
+    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    isDeleted BOOLEAN NOT NULL DEFAULT FALSE,
+    timeDeleted TIMESTAMP NULL,
+
+    FOREIGN KEY (threadID)
+        REFERENCES Threads(threadID),
+
+    FOREIGN KEY (userID)
+        REFERENCES Users(userID)
+);
+
+
+CREATE TABLE Replies (
+    replyID SERIAL PRIMARY KEY,
+    commentID INT NOT NULL,
+    userID INT NOT NULL,
+    replyContent VARCHAR(255) NOT NULL,
+    repliedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    isDeleted BOOLEAN NOT NULL DEFAULT FALSE,
+    timeDeleted TIMESTAMP NULL,
+
+    FOREIGN KEY (commentID)
+        REFERENCES Comments(commentID),
+
+    FOREIGN KEY (userID)
+        REFERENCES Users(userID)
+);
+
+
+CREATE TABLE systemAdmins (
+    systemAdminID SERIAL PRIMARY KEY,
+    userID INT NOT NULL,
+
+    FOREIGN KEY (userID)
+        REFERENCES Users(userID)
+);
+
+
+CREATE TYPE permission_status AS ENUM (
+    'PENDING',
+    'APPROVED',
+    'REJECTED'
+);
+
+
+CREATE TABLE PermissionRequest (
+    PermissionRequestID SERIAL PRIMARY KEY,
+    groupID INT NOT NULL,
+    userID INT NOT NULL,
+
+    status permission_status NOT NULL DEFAULT 'PENDING',
+
+    requestedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    reviewedAt TIMESTAMP NULL,
+
+    FOREIGN KEY (groupID)
+        REFERENCES Groups(groupID),
+
+    FOREIGN KEY (userID)
+        REFERENCES Users(userID)
+);
+
+
+CREATE TABLE Likes (
+    likeID SERIAL PRIMARY KEY,
+    threadID INT NULL,
+    userID INT NOT NULL,
+    commentID INT NULL,
+
+    FOREIGN KEY (commentID)
+        REFERENCES Comments(commentID),
+
+    FOREIGN KEY (userID)
+        REFERENCES Users(userID),
+
+    FOREIGN KEY (threadID)
+        REFERENCES Threads(threadID),
+
+    CHECK (
+        (threadID IS NOT NULL AND commentID IS NULL)
+        OR
+        (threadID IS NULL AND commentID IS NOT NULL)
+    )
+);
+
+
+CREATE UNIQUE INDEX unique_thread_like
+ON Likes(userID, threadID)
+WHERE threadID IS NOT NULL;
+
+CREATE UNIQUE INDEX unique_comment_like
+ON Likes(userID, commentID)
+WHERE commentID IS NOT NULL;
+
+CREATE TABLE Events (
+    eventID SERIAL PRIMARY KEY,
+    groupID INT NOT NULL,
+    eventTitle VARCHAR(50),
+    content VARCHAR(255),
+    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (groupID)
+        REFERENCES Groups(groupID)
+
+   FOREIGN KEY (userID)
+        REFERENCES Users(userID)
+);
+
+
+CREATE TABLE Announcements (
+    announcementID SERIAL PRIMARY KEY,
+    groupID INT NOT NULL,
+    userID INT NOT NULL,
+    announcementTitle VARCHAR(55) NOT NULL,
+    content VARCHAR(255) NOT NULL,
+    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (groupID)
+        REFERENCES Groups(groupID),
+
+    FOREIGN KEY (userID)
+        REFERENCES Users(userID)
+);
