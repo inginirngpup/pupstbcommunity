@@ -1,41 +1,26 @@
 --INSERT---------------------
 
-INSERT INTO "Groups" ("userID", "groupName", "description", "createdAt")
-SELECT
-    ((i % 500) + 1),
-    'Group ' || i,
-    'Description for group ' || i,
-    NOW() - (i || ' days')::interval
-FROM generate_series(1, 200) AS i;
+//GROUPS
+INSERT INTO groups (user_id, group_name, description)
+VALUES (1, 'CS Batch 2026', 'Official group for CS 2026 batch');
 
-INSERT INTO "PermissionRequest" ("groupID", "userID", "status", "requestedAt", "reviewedAt")
-SELECT
-    ((i % 200) + 1),
-    ((i % 500) + 1),
-    (ARRAY['PENDING','APPROVED','REJECTED']::permission_status[])[(i % 3) + 1],
-    NOW() - (i || ' hours')::interval,
-    CASE WHEN i % 3 = 0 THEN NULL ELSE NOW() - (i || ' hours')::interval + interval '1 hour' END
-FROM generate_series(1, 2000) AS i;
+//GROUP MEMBERS
+INSERT INTO groupmembers (user_id, group_id, role)
+VALUES (2, 1, 'member');
 
-INSERT INTO "Announcements" ("groupID", "userID", "announcementTitle", "content", "createdAt")
-SELECT
-    ((i % 200) + 1),
-    ((i % 500) + 1),
-    'Announcement ' || i,
-    'Content body ' || i,
-    NOW() - (i || ' hours')::interval
-FROM generate_series(1, 800) AS i;
+//ANNOUNCEMENTS
+INSERT INTO announcements (group_id, member_id, announcement_title, announcement_body, priority)
+VALUES (1, 1, 'Meeting Reminder', 'Meeting this Friday at 3PM.', 1);
 
-INSERT INTO "Events" ("groupID", "userID", "eventTitle", "content", "createdAt")
-SELECT
-    ((i % 200) + 1),
-    ((i % 500) + 1),
-    'Event ' || i,
-    'Event details ' || i,
-    NOW() - (i || ' hours')::interval
-FROM generate_series(1, 400) AS i;
+//EVENTS
+INSERT INTO events (group_id, member_id, event_title, event_description, expires_at)
+VALUES (1, 1, 'Orientation Day', 'Welcome event for new members', '2026-09-30 17:00:00');
 
-ANALYZE "Groups";
-ANALYZE "PermissionRequest";
-ANALYZE "Announcements";
-ANALYZE "Events";
+//EVENT ATTENDEES
+INSERT INTO eventattendees (event_id, member_id)
+VALUES (1, 2);
+
+//POSTS WITHIN THE GROUP
+INSERT INTO posts (user_id, group_id, content_body)
+VALUES (2, 1, 'Excited for the orientation this weekend!');
+
