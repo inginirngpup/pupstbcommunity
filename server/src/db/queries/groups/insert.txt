@@ -1,0 +1,26 @@
+--INSERT---------------------
+
+//GROUPS
+INSERT INTO groups (user_id, group_name, description)
+VALUES (1, 'CS Batch 2026', 'Official group for CS 2026 batch');
+
+//GROUP MEMBERS
+INSERT INTO groupmembers (user_id, group_id, role)
+VALUES (2, 1, 'member');
+
+//ANNOUNCEMENTS
+INSERT INTO announcements (group_id, member_id, announcement_title, announcement_body, priority)
+VALUES (1, 1, 'Meeting Reminder', 'Meeting this Friday at 3PM.', 1);
+
+//EVENTS
+INSERT INTO events (group_id, member_id, event_title, event_description, expires_at)
+VALUES (1, 1, 'Orientation Day', 'Welcome event for new members', '2026-09-30 17:00:00');
+
+//EVENT ATTENDEES
+INSERT INTO eventattendees (event_id, member_id)
+VALUES (1, 2);
+
+//POSTS WITHIN THE GROUP
+INSERT INTO posts (user_id, group_id, content_body)
+VALUES (2, 1, 'Excited for the orientation this weekend!');
+

@@ -1,0 +1,20 @@
+--INSERT--
+
+
+
+--SELECT--
+
+//QUERY 1: Select all the data in users table
+
+SELECT userID, userName, isVerifiedStudent, password, studentNumber, isActive, joinedAt, isAdmin, createdAt FROM Users;
+
+//QUERY 1: Select all the data in users table where active is true
+SELECT * FROM Users WHERE isActive = TRUE;
+
+
+//QUERY 1: Select all the data in users table where the users is verified
+SELECT * FROM Users WHERE isVerifiedStudent = TRUE
+
+
+//QUERY 1: Select all the data in users table where active is true and veried is true
+SELECT userID, userName, studentNumber FROM Users WHERE isActive = TRUE AND isVerifiedStudent = TRUE;
