@@ -17,16 +17,6 @@ SET announcement_body = 'Meeting moved to Saturday at 10AM.',
     priority = 2
 WHERE announcementID = 1;
 
-//EVENTS
-UPDATE events
-SET event_status = 'completed'
-WHERE event_id = 1;
-
-//EVENT ATTENDEES
-UPDATE eventattendees
-SET registered_at = CURRENT_TIMESTAMP
-WHERE attendee_id = 1;
-
 //POSTS WITHIN THE GROUP
 UPDATE posts
 SET content_body = 'Excited for the orientation this weekend! Don''t forget to bring your ID.'
