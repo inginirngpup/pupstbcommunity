@@ -1,0 +1,91 @@
+READ QUERY FOR GROUPS
+
+--Read all of members inside a group.
+
+SELECT 
+    groupmembers.user_id,
+    users.username,
+    groupmembers.role,
+    groupmembers.joined_at
+FROM groupmembers
+JOIN users ON groupmembers.user_id = users.user_id
+WHERE groupmembers.group_id = 1
+ORDER BY groupmembers.role ASC;
+
+
+==========================================================
+--Read every posts of members along with its total likes.
+
+SELECT
+    users.username,
+    posts.post_id,
+    posts.content_body,
+    posts.created_at,
+COUNT(postlikes.post_like_id) AS total_likes
+FROM users
+JOIN posts ON users.user_id = posts.user_id
+JOIN groupmembers ON users.user_id = groupmembers.user_id
+    AND groupmembers.group_id = posts.group_id
+LEFT JOIN postlikes ON posts.post_id = postlikes.post_id
+WHERE posts.group_id = 1
+    AND posts.is_deleted = FALSE
+GROUP BY 
+    users.username, 
+    posts.post_id, 
+    posts.content_body, 
+    posts.created_at
+ORDER BY total_likes DESC, posts.created_at;
+
+
+==========================================================
+--Read every comment of members along with its total likes.
+
+SELECT
+    users.username,
+    comments.comment_id,
+    comments.comment_body,
+    comments.commented_at,
+    COUNT(commentlikes.comment_like_id) AS total_likes
+FROM users
+JOIN comments ON users.user_id = comments.user_id
+JOIN posts ON comments.post_id = posts.post_id
+JOIN groupmembers ON users.user_id = groupmembers.user_id
+    AND groupmembers.group_id = posts.group_id
+LEFT JOIN commentlikes ON comments.comment_id = commentlikes.comment_id
+WHERE posts.group_id = 1
+    AND comments.is_deleted = FALSE
+    AND posts.is_deleted = FALSE
+GROUP BY
+    users.username,
+    comments.comment_id,
+    comments.comment_body,
+    comments.commented_at
+ORDER BY total_likes DESC, comments.commented_at;
+
+
+==========================================================
+--Read all members replies along with its total likes.
+
+SELECT
+    users.username,
+    replies.reply_id,
+    replies.reply_body,
+    replies.replied_at,
+    COUNT(replylikes.reply_like_id) AS total_likes
+FROM replies
+JOIN comments ON replies.comment_id = comments.comment_id
+JOIN posts ON comments.post_id = posts.post_id
+JOIN users ON replies.user_id = users.user_id
+JOIN groupmembers ON groupmembers.user_id = replies.user_id
+    AND groupmembers.group_id = posts.group_id
+LEFT JOIN replylikes ON replylikes.reply_id = replies.reply_id
+WHERE posts.group_id = 1
+    AND replies.is_deleted = FALSE
+    AND comments.is_deleted = FALSE
+    AND posts.is_deleted = FALSE
+GROUP BY
+    replies.reply_id,
+    users.username,
+    replies.reply_body,
+    replies.replied_at
+ORDER BY total_likes DESC, replies.replied_at ASC;

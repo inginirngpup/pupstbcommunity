@@ -1,0 +1,80 @@
+CREATE TABLE groups (
+    group_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    group_name VARCHAR(255) NOT NULL,
+    description VARCHAR(1000),
+    reviewed_by VARCHAR(255),
+    verification_status VARCHAR(50) NOT NULL DEFAULT 'PENDING',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    reviewed_at TIMESTAMPTZ,
+
+    CONSTRAINT fk_groups_user
+        FOREIGN KEY (user_id)
+        REFERENCES users(user_id)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE groupmembers (
+    member_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    group_id BIGINT NOT NULL,
+    joined_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    role VARCHAR(50) NOT NULL DEFAULT 'MEMBER',
+
+    CONSTRAINT fk_groupmembers_user
+        FOREIGN KEY (user_id)
+        REFERENCES users(user_id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_groupmembers_group
+        FOREIGN KEY (group_id)
+        REFERENCES groups(group_id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT unique_group_member
+        UNIQUE (user_id, group_id)
+);
+
+CREATE TABLE posts (
+    post_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    group_id BIGINT NOT NULL,
+    content_body TEXT NOT NULL,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    time_deleted TIMESTAMPTZ,
+
+    CONSTRAINT fk_posts_user
+        FOREIGN KEY (user_id)
+        REFERENCES users(user_id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_posts_group
+        FOREIGN KEY (group_id)
+        REFERENCES groups(group_id)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE announcements (
+    announcement_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    group_id BIGINT NOT NULL,
+    member_id BIGINT NOT NULL,
+    announcement_title VARCHAR(255) NOT NULL,
+    announcement_body TEXT NOT NULL,
+    priority INT NOT NULL DEFAULT 0,
+    scheduled_at TIMESTAMPTZ,
+    expires_at TIMESTAMPTZ,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    time_deleted TIMESTAMPTZ,
+
+    CONSTRAINT fk_announcements_group
+        FOREIGN KEY (group_id)
+        REFERENCES groups(group_id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_announcements_member
+        FOREIGN KEY (member_id)
+        REFERENCES groupmembers(member_id)
+        ON DELETE CASCADE
+);
