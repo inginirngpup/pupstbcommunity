@@ -1,20 +1,47 @@
---INSERT--
+--INSERT QUERIES--
+
+Query 1: User created an account
+
+INSERT INTO Users (userName, password, student_number)
+VALUES ('jDoe', 'test123', '1990-00001-ST-1');
 
 
 
---SELECT--
+Query 2: User posted a thread
 
-//QUERY 1: Select all the data in users table
-
-SELECT userID, userName, isVerifiedStudent, password, studentNumber, isActive, joinedAt, isAdmin, createdAt FROM Users;
-
-//QUERY 1: Select all the data in users table where active is true
-SELECT * FROM Users WHERE isActive = TRUE;
+INSERT INTO posts (user_id, content_body) 
+VALUES (1, 'lorem ipsum dolor sit amet');
 
 
-//QUERY 1: Select all the data in users table where the users is verified
-SELECT * FROM Users WHERE isVerifiedStudent = TRUE
+
+Query 3: User liked a post
+
+INSERT INTO postlikes (post_id, user_id) 
+VALUES (1, 1);
 
 
-//QUERY 1: Select all the data in users table where active is true and veried is true
-SELECT userID, userName, studentNumber FROM Users WHERE isActive = TRUE AND isVerifiedStudent = TRUE;
+
+Query 4: User commented on a post
+
+INSERT INTO comments (post_id, user_id, comment_body) 
+VALUES (1, 1, 'lorem ipsum dolor sit amet');
+
+
+
+Query 5: User liked a comment
+
+INSERT INTO commentlikes (comment_id, user_id) 
+VALUES (1, 1);
+
+
+
+Query 6: User replied to a comment
+
+INSERT INTO replies (comment_id, user_id, reply_body) 
+VALUES (1, 1, 'Dolor sit amet');
+
+
+
+Query 7: User liked a reply
+INSERT INTO replylikes (reply_id, user_id) 
+VALUES (1, 1);
