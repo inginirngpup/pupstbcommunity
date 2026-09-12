@@ -1,163 +1,130 @@
 --CREATE QUERIES--
 
 CREATE TABLE Users (
-    userID SERIAL PRIMARY KEY,
-    userName VARCHAR(100) NOT NULL UNIQUE,
-    isVerifiedStudent BOOLEAN NOT NULL DEFAULT FALSE,
-    password VARCHAR(100) NOT NULL,
-    studentNumber VARCHAR(50) UNIQUE,
-    isActive BOOLEAN NOT NULL DEFAULT FALSE,
-    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    user_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	username VARCHAR (15) NOT NULL,
+	password VARCHAR (255) NOT NULL,
+	student_number VARCHAR (15) NOT NULL,
+	is_account_verified BOOL DEFAULT FALSE,
+	is_sys_admin BOOL DEFAULT FALSE,
+	joined_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+	created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 
 CREATE TABLE Groups (
-    groupID SERIAL PRIMARY KEY,
-    groupName VARCHAR(50) NOT NULL UNIQUE,
-    description VARCHAR(255),
-    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    userID INT NOT NULL,
-
-    FOREIGN KEY (userID)
-        REFERENCES Users(userID)
+    group_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id BIGINT NOT NULL REFERENCES users(user_id),
+    group_name VARCHAR (100),
+    description VARCHAR (1000),
+    verification_status VARCHAR(20) NOT NULL DEFAULT 'pending'
+    CHECK (verification_status IN ('pending', 'approved', 'rejected')),
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+reviewdAt TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 
-CREATE TABLE Threads (
-    threadID SERIAL PRIMARY KEY,
-    userID INT NOT NULL,
-    content VARCHAR(255) NOT NULL,
-
-    FOREIGN KEY (userID)
-        REFERENCES Users(userID)
+CREATE TABLE Posts (
+    post_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id BIGINT NOT NULL REFERENCES users(user_id),
+    group_id BIGINT NULL REFERENCES groups(group_id),
+    content_body TEXT NOT NULL,
+    is_deleted BOOL DEFAULT FALSE,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    time_deleted TIMESTAMPTZ
 );
 
 
-CREATE TABLE Comments (
-    commentID SERIAL PRIMARY KEY,
-    threadID INT NOT NULL,
-    userID INT NOT NULL,
-    commentContent VARCHAR(255) NOT NULL,
-    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    isDeleted BOOLEAN NOT NULL DEFAULT FALSE,
-    timeDeleted TIMESTAMP NULL,
-
-    FOREIGN KEY (threadID)
-        REFERENCES Threads(threadID),
-
-    FOREIGN KEY (userID)
-        REFERENCES Users(userID)
+CREATE TABLE postlikes (
+	post_like_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	post_id BIGINT NOT NULL REFERENCES posts(post_id),
+	user_id BIGINT NOT NULL REFERENCES users(user_id),
+	liked_post_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 
-CREATE TABLE Replies (
-    replyID SERIAL PRIMARY KEY,
-    commentID INT NOT NULL,
-    userID INT NOT NULL,
-    replyContent VARCHAR(255) NOT NULL,
-    repliedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    isDeleted BOOLEAN NOT NULL DEFAULT FALSE,
-    timeDeleted TIMESTAMP NULL,
-
-    FOREIGN KEY (commentID)
-        REFERENCES Comments(commentID),
-
-    FOREIGN KEY (userID)
-        REFERENCES Users(userID)
+CREATE TABLE comments (
+	comment_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	post_id BIGINT NOT NULL REFERENCES posts(post_id),
+	user_id BIGINT NOT NULL REFERENCES users(user_id),
+	comment_body TEXT NOT NULL,
+	commented_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+	is_deleted BOOL DEFAULT FALSE,
+	time_deleted TIMESTAMPTZ
 );
 
 
-CREATE TABLE systemAdmins (
-    systemAdminID SERIAL PRIMARY KEY,
-    userID INT NOT NULL,
-
-    FOREIGN KEY (userID)
-        REFERENCES Users(userID)
+CREATE TABLE commentlikes (
+	comment_like_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	comment_id BIGINT NOT NULL REFERENCES comments(comment_id),
+	user_id BIGINT NOT NULL REFERENCES users(user_id),
+	liked_comment_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 
-CREATE TYPE permission_status AS ENUM (
-    'PENDING',
-    'APPROVED',
-    'REJECTED'
+CREATE TABLE replies (
+	replyID BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	comment_id BIGINT NOT NULL REFERENCES comments(comment_id),
+	user_id BIGINT NOT NULL REFERENCES users(user_id),
+	reply_body TEXT NOT NULL,
+	replied_at  TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+	is_deleted BOOL DEFAULT FALSE,
+	time_deleted TIMESTAMPTZ
 );
 
 
-CREATE TABLE PermissionRequest (
-    PermissionRequestID SERIAL PRIMARY KEY,
-    groupID INT NOT NULL,
-    userID INT NOT NULL,
-
-    status permission_status NOT NULL DEFAULT 'PENDING',
-
-    requestedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    reviewedAt TIMESTAMP NULL,
-
-    FOREIGN KEY (groupID)
-        REFERENCES Groups(groupID),
-
-    FOREIGN KEY (userID)
-        REFERENCES Users(userID)
+CREATE TABLE replylikes (
+	reply_like_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	reply_id BIGINT NOT NULL REFERENCES replies(replyID),
+	user_id BIGINT NOT NULL REFERENCES users(user_id),
+	liked_reply_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+	time_deleted TIMESTAMPTZ
 );
 
 
-CREATE TABLE Likes (
-    likeID SERIAL PRIMARY KEY,
-    threadID INT NULL,
-    userID INT NOT NULL,
-    commentID INT NULL,
-
-    FOREIGN KEY (commentID)
-        REFERENCES Comments(commentID),
-
-    FOREIGN KEY (userID)
-        REFERENCES Users(userID),
-
-    FOREIGN KEY (threadID)
-        REFERENCES Threads(threadID),
-
-    CHECK (
-        (threadID IS NOT NULL AND commentID IS NULL)
-        OR
-        (threadID IS NULL AND commentID IS NOT NULL)
-    )
+CREATE TABLE groupmembers (
+	member_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	user_id BIGINT NOT NULL REFERENCES users(user_id),
+	group_id BIGINT NOT NULL REFERENCES groups(group_id),
+	joined_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+	role VARCHAR (7) NOT NULL DEFAULT 'member' CHECK (role IN ('admin', 'member'))
 );
 
 
-CREATE UNIQUE INDEX unique_thread_like
-ON Likes(userID, threadID)
-WHERE threadID IS NOT NULL;
-
-CREATE UNIQUE INDEX unique_comment_like
-ON Likes(userID, commentID)
-WHERE commentID IS NOT NULL;
-
-CREATE TABLE Events (
-    eventID SERIAL PRIMARY KEY,
-    groupID INT NOT NULL,
-    eventTitle VARCHAR(50),
-    content VARCHAR(255),
-    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (groupID)
-        REFERENCES Groups(groupID)
-
-   FOREIGN KEY (userID)
-        REFERENCES Users(userID)
+CREATE TABLE announcements (
+	announcementID BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	group_id BIGINT NOT NULL REFERENCES groups(group_id),
+	member_id BIGINT NOT NULL REFERENCES groupmembers(member_id),
+	announcement_title VARCHAR (100),
+	announcement_body TEXT,
+	priority INT NOT NULL DEFAULT 0,
+	scheduled_at TIMESTAMPTZ GENERATED ALWAYS AS (created_at) STORED,
+	expires_at TIMESTAMPTZ,
+	is_deleted BOOL DEFAULT FALSE,
+	created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+	time_deleted TIMESTAMPTZ
 );
 
 
-CREATE TABLE Announcements (
-    announcementID SERIAL PRIMARY KEY,
-    groupID INT NOT NULL,
-    userID INT NOT NULL,
-    announcementTitle VARCHAR(55) NOT NULL,
-    content VARCHAR(255) NOT NULL,
-    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+CREATE TABLE events (
+	event_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	group_id BIGINT NOT NULL REFERENCES groups(group_id),
+	member_id BIGINT NOT NULL REFERENCES groupmembers(member_id),
+	event_title VARCHAR (150),
+	event_description TEXT,
+	scheduled_at TIMESTAMPTZ GENERATED ALWAYS AS (created_at) STORED,
+	expires_at TIMESTAMPTZ,
+	created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+	is_deleted BOOL DEFAULT FALSE,
+	time_deleted TIMESTAMPTZ,
+	event_status VARCHAR (15) NOT NULL DEFAULT 'pending' 
+	CHECK (event_status IN ('upcoming', 'ongoing', 'completed', 'cancelled'))
+);
 
-    FOREIGN KEY (groupID)
-        REFERENCES Groups(groupID),
 
-    FOREIGN KEY (userID)
-        REFERENCES Users(userID)
+CREATE TABLE eventattendees (
+	attendee_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	event_id BIGINT NOT NULL REFERENCES events(event_id),
+	member_id BIGINT NOT NULL REFERENCES groupmembers(member_id),
+	registered_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );

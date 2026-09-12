@@ -1,24 +1,50 @@
 --UPDATE QUERIES--
 
+Query 1: System Admin verified the student
+
 UPDATE users SET 
-isverifiedstudent = 'TRUE',
-isactive = 'TRUE'
-WHERE userid = 1;
+is_account_verified = 'TRUE'
+WHERE user_id = 1;
 
 
-UPDATE permissionrequest SET 
-status = 'REJECTED',
-reviewedat = CURRENT_TIMESTAMP
-WHERE permissionrequestid = 2;
 
+Query 2: User changed his username
+
+UPDATE users SET 
+username = 'sJobs'
+WHERE user_id = 1;
+
+
+
+Query 3: User changed his password
+
+UPDATE users SET 
+password = 'abc123'
+WHERE user_id = 1;
+
+
+
+Query 4: User deleted a post
+
+UPDATE posts SET 
+is_deleted = 'TRUE',
+time_deleted = CURRENT_TIMESTAMP
+WHERE post_id = 1;
+
+
+
+Query 5: User deleted a comment
 
 UPDATE comments SET 
-isdeleted = 'TRUE',
-timedeleted = CURRENT_TIMESTAMP
-WHERE commentid = 2;
+is_deleted = 'TRUE',
+time_deleted = CURRENT_TIMESTAMP
+WHERE comment_id = 1;
 
+
+
+Query 6: User deleted a reply
 
 UPDATE replies SET 
-isdeleted = 'TRUE',
-timedeleted = CURRENT_TIMESTAMP
-WHERE replyid = 1;
+is_deleted = 'TRUE',
+time_deleted = CURRENT_TIMESTAMP
+WHERE reply_id = 1;
