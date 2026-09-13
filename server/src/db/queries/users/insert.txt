@@ -1,1 +1,47 @@
---INSERT--
+--INSERT QUERIES--
+
+Query 1: User created an account
+
+INSERT INTO Users (userName, password, student_number)
+VALUES ('jDoe', 'test123', '1990-00001-ST-1');
+
+
+
+Query 2: User posted a thread
+
+INSERT INTO posts (user_id, content_body) 
+VALUES (1, 'lorem ipsum dolor sit amet');
+
+
+
+Query 3: User liked a post
+
+INSERT INTO postlikes (post_id, user_id) 
+VALUES (1, 1);
+
+
+
+Query 4: User commented on a post
+
+INSERT INTO comments (post_id, user_id, comment_body) 
+VALUES (1, 1, 'lorem ipsum dolor sit amet');
+
+
+
+Query 5: User liked a comment
+
+INSERT INTO commentlikes (comment_id, user_id) 
+VALUES (1, 1);
+
+
+
+Query 6: User replied to a comment
+
+INSERT INTO replies (comment_id, user_id, reply_body) 
+VALUES (1, 1, 'Dolor sit amet');
+
+
+
+Query 7: User liked a reply
+INSERT INTO replylikes (reply_id, user_id) 
+VALUES (1, 1);

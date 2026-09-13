@@ -1,0 +1,50 @@
+--UPDATE QUERIES--
+
+Query 1: System Admin verified the student
+
+UPDATE users SET 
+is_account_verified = 'TRUE'
+WHERE user_id = 1;
+
+
+
+Query 2: User changed his username
+
+UPDATE users SET 
+username = 'sJobs'
+WHERE user_id = 1;
+
+
+
+Query 3: User changed his password
+
+UPDATE users SET 
+password = 'abc123'
+WHERE user_id = 1;
+
+
+
+Query 4: User deleted a post
+
+UPDATE posts SET 
+is_deleted = 'TRUE',
+time_deleted = CURRENT_TIMESTAMP
+WHERE post_id = 1;
+
+
+
+Query 5: User deleted a comment
+
+UPDATE comments SET 
+is_deleted = 'TRUE',
+time_deleted = CURRENT_TIMESTAMP
+WHERE comment_id = 1;
+
+
+
+Query 6: User deleted a reply
+
+UPDATE replies SET 
+is_deleted = 'TRUE',
+time_deleted = CURRENT_TIMESTAMP
+WHERE reply_id = 1;
