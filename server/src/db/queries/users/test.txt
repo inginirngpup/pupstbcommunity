@@ -1,44 +1,212 @@
-
---SELECT--
-//USERS table
-
-//QUERY 1: Select all the data in users table
-
-SELECT userID, userName, isVerifiedStudent, password, studentNumber, isActive, joinedAt, isAdmin, createdAt FROM Users;
+//Selecting all users in users table
 SELECT * FROM users;
 
-//QUERY 2: Select all the data in users table with specific ID
+// Getting specific user using username 
+SELECT
+    user_id,
+    username,
+    student_number,
+    is_account_verified,
+    is_sys_admin,
+    joined_at,
+    created_at
+FROM users
+WHERE username = 'username_here';
 
-SELECT userID, userName, isVerifiedStudent, password, studentNumber, isActive, joinedAt, isAdmin, createdAt FROM Users WHERE userID = 5;
-SELECT * FROM users WHERE userID = 5;
+//Selecting verified student only
+SELECT
+    user_id,
+    username,
+    student_number,
+    joined_at
+FROM users
+WHERE is_account_verified = TRUE;
 
-//QUERY 3: Select all the data in users table where active is true
-SELECT * FROM Users WHERE isActive = TRUE;
+//Selecting system administrators only
+SELECT
+    user_id,
+    username,
+    student_number,
+    is_account_verified,
+    is_sys_admin,
+    joined_at,
+    created_at
+FROM users
+WHERE is_sys_admin = TRUE;
 
-//QUERY 4: Select all the data in users table where the users is verified
-SELECT * FROM Users WHERE isVerifiedStudent = TRUE
+// Selecting groups created by a specific user
+SELECT
+    users.user_id,
+    users.username,
+    groups.group_id,
+    groups.group_name,
+    groups.description,
+    groups.reviewed_by,
+    groups.verification_status,
+    groups.created_at AS group_created_at,
+    groups.reviewed_at
+FROM users
+LEFT JOIN groups
+    ON users.user_id = groups.user_id
+WHERE users.user_id = 1;
 
-//QUERY 5: Select all the data in users table where active is true and veried is true
-SELECT * FROM Users WHERE isActive = TRUE AND isVerifiedStudent = TRUE;
+//Selecting groups where a specific user is a member
+SELECT
+    users.user_id,
+    users.username,
+    groupmembers.member_id,
+    groupmembers.group_id,
+    groupmembers.joined_at
+FROM users
+LEFT JOIN groupmembers
+    ON users.user_id = groupmembers.user_id
+WHERE users.user_id = 1;
 
 
-//sysAdmin table
-
-//QUERY 1: Select the admin information 
-SELECT 
-    SysAdmin.sysAdminID,
-    Users.userID,
-    Users.userName,
-    Users.isVerifiedStudent,
-    Users.password,
-    Users.studentNumber,
-    Users.isActive,
-    Users.joinedAt,
-    Users.isAdmin,
-    Users.createdAt
-FROM SysAdmin
-INNER JOIN Users
-    ON SysAdmin.userID = Users.userID
-WHERE Users.isAdmin = TRUE;
+//Selecting non-deleted posts created by a specific user
+SELECT
+    users.user_id,
+    users.username,
+    posts.post_id,
+    posts.group_id,
+    posts.content_body,
+    posts.is_deleted,
+    posts.created_at,
+    posts.time_deleted
+FROM users
+LEFT JOIN posts
+    ON users.user_id = posts.user_id
+    AND posts.is_deleted = FALSE
+WHERE users.user_id = 1;
 
 
+//Selecting posts created by a user in a specific group
+SELECT
+    users.user_id,
+    users.username,
+    groups.group_id,
+    groups.group_name,
+    posts.post_id,
+    posts.content_body,
+    posts.created_at
+FROM users
+LEFT JOIN posts
+    ON users.user_id = posts.user_id
+    AND posts.is_deleted = FALSE
+LEFT JOIN groups
+    ON posts.group_id = groups.group_id
+WHERE users.user_id = 1
+  AND groups.group_id = 10;
+
+//Selecting posts liked by a specific user
+SELECT
+    users.user_id,
+    users.username,
+    postlikes.post_like_id,
+    postlikes.post_id,
+    postlikes.liked_post_at,
+    posts.content_body,
+    posts.group_id,
+    posts.created_at
+FROM users
+LEFT JOIN postlikes
+    ON users.user_id = postlikes.user_id
+LEFT JOIN posts
+    ON postlikes.post_id = posts.post_id
+    AND posts.is_deleted = FALSE
+WHERE users.user_id = 1;
+
+//Selecting comments made by a specific user
+SELECT
+    users.user_id,
+    users.username,
+    comments.comment_id,
+    comments.post_id,
+    comments.comment_body,
+    comments.commented_at,
+    comments.is_deleted,
+    comments.time_deleted
+FROM users
+LEFT JOIN comments
+    ON users.user_id = comments.user_id
+    AND comments.is_deleted = FALSE
+WHERE users.user_id = 1;
+
+//Selecting comments made by a user on a specific post
+SELECT
+    users.user_id,
+    users.username,
+    posts.post_id,
+    posts.content_body,
+    comments.comment_id,
+    comments.comment_body,
+    comments.commented_at
+FROM users
+LEFT JOIN comments
+    ON users.user_id = comments.user_id
+    AND comments.is_deleted = FALSE
+LEFT JOIN posts
+    ON comments.post_id = posts.post_id
+    AND posts.is_deleted = FALSE
+WHERE users.user_id = 1
+  AND posts.post_id = 10;
+
+//Selecting comments liked by a specific user
+SELECT
+    users.user_id,
+    users.username,
+    commentlikes.comment_like_id,
+    commentlikes.comment_id,
+    commentlikes.liked_comment_at,
+    comments.post_id,
+    comments.comment_body,
+    comments.commented_at
+FROM users
+LEFT JOIN commentlikes
+    ON users.user_id = commentlikes.user_id
+LEFT JOIN comments
+    ON commentlikes.comment_id = comments.comment_id
+    AND comments.is_deleted = FALSE
+WHERE users.user_id = 1;
+
+//Selecting replies made by a specific user
+SELECT
+    users.user_id,
+    users.username,
+    replies.reply_id,
+    replies.comment_id,
+    replies.reply_body,
+    replies.replied_at,
+    replies.is_deleted,
+    replies.time_deleted
+FROM users
+LEFT JOIN replies
+    ON users.user_id = replies.user_id
+    AND replies.is_deleted = FALSE
+WHERE users.user_id = 1;
+
+
+//Selecting announcements created by a user in a specific group
+SELECT
+    users.user_id,
+    users.username,
+    groups.group_id,
+    groups.group_name,
+    groupmembers.member_id,
+    announcements.announcement_id,
+    announcements.announcement_title,
+    announcements.announcement_body,
+    announcements.priority,
+    announcements.scheduled_at,
+    announcements.expires_at,
+    announcements.created_at
+FROM users
+LEFT JOIN groupmembers
+    ON users.user_id = groupmembers.user_id
+LEFT JOIN announcements
+    ON groupmembers.member_id = announcements.member_id
+    AND announcements.is_deleted = FALSE
+LEFT JOIN groups
+    ON announcements.group_id = groups.group_id
+WHERE users.user_id = 1
+  AND groups.group_id = 10;
