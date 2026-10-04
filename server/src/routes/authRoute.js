@@ -7,14 +7,13 @@ const {
 } = require('../controllers/authController');
 
 const { getUser } = require('../controllers/userController');
-
 const authMiddleware = require('../middleware/authMiddleware');
 
 // Public routes
 router.post('/register', registerUser);
 router.post('/login', loginUser);
 
-// Protected route
+// Backwards-compatible protected route
 router.get('/profile', authMiddleware, getUser);
 
 module.exports = router;
